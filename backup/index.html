@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIF Maker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>GIF Maker</h1>
+        
+        <div id="ffmpeg-status" style="text-align: center; padding: 10px; margin-bottom: 20px; background: #e8f4fd; border-radius: 5px; display: none;">
+            <span id="ffmpeg-status-text">🔄 Loading FFmpeg for video processing...</span>
+        </div>
+        
+        <div class="input-section">
+            <label for="youtube-url">YouTube URL:</label>
+            <input type="text" id="youtube-url" placeholder="Enter YouTube URL">
+            <button id="load-video">Load Video</button>
+            
+            <div class="alternative-input" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <label for="video-file">Or upload a video file:</label>
+                <input type="file" id="video-file" accept="video/*">
+                <button id="load-file">Load File</button>
+            </div>
+        </div>
+
+        <div class="video-section" id="video-section" style="display: none;">
+            <video id="video-player" controls></video>
+            
+            <div class="timeline-controls">
+                <h3>Clip Settings</h3>
+                <div class="time-inputs">
+                    <label for="start-time">Start Time (seconds):</label>
+                    <input type="number" id="start-time" min="0" step="0.1" value="0">
+                    
+                    <label for="end-time">End Time (seconds):</label>
+                    <input type="number" id="end-time" min="0" step="0.1" value="10">
+                </div>
+                
+                <div class="preview-controls">
+                    <button id="preview-clip">Preview Clip</button>
+                    <button id="set-current-start">Set Current as Start</button>
+                    <button id="set-current-end">Set Current as End</button>
+                </div>
+            </div>
+            
+            <div class="text-overlay-section">
+                <h3>Text Overlay</h3>
+                
+                <div class="text-controls">
+                    <label for="overlay-text">Text:</label>
+                    <input type="text" id="overlay-text" placeholder="Enter text for overlay">
+                    
+                    <label for="text-position">Position:</label>
+                    <select id="text-position">
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                    </select>
+                    
+                    <label for="text-color">Color:</label>
+                    <input type="color" id="text-color" value="#ffffff">
+                    
+                    <label for="text-font">Font:</label>
+                    <select id="text-font">
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Impact">Impact</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                    
+                    <label for="text-size">Size:</label>
+                    <input type="range" id="text-size" min="12" max="48" value="24">
+                    <span id="text-size-value">24px</span>
+                </div>
+                
+                <div class="text-preview">
+                    <div id="text-preview-display">Preview Text</div>
+                </div>
+            </div>
+            
+            <div class="gif-controls">
+                <button id="create-gif">Create GIF</button>
+                <div id="progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span id="progress-text">Creating GIF...</span>
+                </div>
+                <a id="download-link" style="display: none;">Download GIF</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/node_modules/@ffmpeg/ffmpeg/dist/umd/ffmpeg.js"></script>
+    <script src="/node_modules/@ffmpeg/util/dist/umd/util.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
