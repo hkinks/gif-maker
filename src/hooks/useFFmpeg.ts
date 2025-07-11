@@ -20,16 +20,69 @@ export const useFFmpeg = () => {
         console.log('[FFmpeg]', message);
       });
 
-      await ffmpegInstance.load({
-        coreURL: '/node_modules/@ffmpeg/core/dist/umd/ffmpeg-core.js',
-        wasmURL: '/node_modules/@ffmpeg/core/dist/umd/ffmpeg-core.wasm'
+      ffmpegInstance.on('progress', ({ progress }) => {
+        console.log('[FFmpeg Progress]', progress);
       });
+
+      // Try different loading strategies with latest version
+      const configs = [
+        {
+          name: 'unpkg.com',
+          coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+          wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
+        },
+        {
+          name: 'jsdelivr.net',
+          coreURL: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+          wasmURL: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
+        },
+        {
+          name: 'default',
+          coreURL: undefined,
+          wasmURL: undefined
+        }
+      ];
+
+      let lastError;
+      let loadingSuccess = false;
+      
+      for (const config of configs) {
+        try {
+          console.log(`[FFmpeg] Attempting to load from: ${config.name}`);
+          if (config.coreURL) {
+            console.log(`[FFmpeg] Core URL: ${config.coreURL}`);
+            console.log(`[FFmpeg] WASM URL: ${config.wasmURL}`);
+          }
+          
+          // Add timeout to prevent hanging
+          const loadPromise = config.name === 'default' 
+            ? ffmpegInstance.load() 
+            : ffmpegInstance.load(config);
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Loading timeout after 30 seconds')), 30000)
+          );
+          
+          await Promise.race([loadPromise, timeoutPromise]);
+          
+          console.log(`[FFmpeg] ✅ Successfully loaded from: ${config.name}`);
+          loadingSuccess = true;
+          break;
+        } catch (configError) {
+          console.warn(`[FFmpeg] ❌ Failed to load from ${config.name}:`, configError);
+          lastError = configError;
+        }
+      }
+
+      if (!loadingSuccess) {
+        throw lastError || new Error('Failed to load FFmpeg from any source');
+      }
 
       setFfmpeg(ffmpegInstance);
       setLoaded(true);
     } catch (err) {
       console.error('Failed to load FFmpeg:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load FFmpeg');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load FFmpeg';
+      setError(`FFmpeg loading failed: ${errorMessage}. Please check your internet connection and try refreshing the page.`);
     } finally {
       setLoading(false);
     }
