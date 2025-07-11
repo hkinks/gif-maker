@@ -142,6 +142,7 @@ body {
 
 .video-player {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .video-player iframe,
@@ -309,6 +310,9 @@ body {
   padding: 20px;
   background: #f8f9fa;
   border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .gif-result h3 {
